@@ -8,17 +8,21 @@ const HEIGHT = 600;
 const BOUNDS = { left: 0, center: WIDTH / 2, right: WIDTH };
 const POINT_RADIUS = 6;
 const MARGIN_WIDTH = 20;
-const DRAWING_SPEED_MULITPLIER = 0.15;
 
-const n_a = 1;
-const n_b = 1.3;
+const thetaAElement = document.getElementById("theta_a");
+const thetaBElement = document.getElementById("theta_b");
 
-const speedA = DRAWING_SPEED_MULITPLIER / n_a;
-const speedB = DRAWING_SPEED_MULITPLIER / n_b;
+let n_a = document.getElementById("n_a").value;
+let n_b = document.getElementById("n_b").value;
+let drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
+let numRays = document.getElementById("numRays").value;
 
-const pointA = {x: WIDTH / 4, y: HEIGHT / 2};
-const pointB = {x: WIDTH * 3 / 4, y: HEIGHT / 2};
-const mouse = {x: 0, y: 0};
+let speedA = drawingSpeedMultiplier / n_a;
+let speedB = drawingSpeedMultiplier / n_b;
+
+const pointA = { x: WIDTH / 4, y: HEIGHT / 2 };
+const pointB = { x: WIDTH * 3 / 4, y: HEIGHT / 2 };
+const mouse = { x: 0, y: 0 };
 var objectBeingDragged = null;
 
 canvas.width = WIDTH;
@@ -27,8 +31,9 @@ canvas.height = HEIGHT;
 let startTime = null;
 let drawStartTime = null;
 let hasStartedDrawing = false;
-
 let fastestRayAngle = null;
+
+let animationReq = null;
 
 function animate(timestamp) {
     if (!startTime) {
@@ -41,11 +46,6 @@ function animate(timestamp) {
             pointA.x = clamp(mouse.x, MARGIN_WIDTH, BOUNDS.center - MARGIN_WIDTH);
             pointA.y = clamp(mouse.y, MARGIN_WIDTH, HEIGHT - MARGIN_WIDTH);
             hasStartedDrawing = false;
-        } else if (!hasStartedDrawing) {
-            // reset ray drawing
-            drawStartTime = timestamp;
-            fastestRayAngle = null;
-            hasStartedDrawing = true;
         }
     } else if (objectBeingDragged == pointB) {
         if (pointB.x != mouse.x || pointB.y != mouse.y) {
@@ -53,12 +53,13 @@ function animate(timestamp) {
             pointB.x = clamp(mouse.x, BOUNDS.center + MARGIN_WIDTH, BOUNDS.right - MARGIN_WIDTH);
             pointB.y = clamp(mouse.y, MARGIN_WIDTH, HEIGHT - MARGIN_WIDTH);
             hasStartedDrawing = false;
-        } else if (!hasStartedDrawing) {
-            // reset ray drawing
-            drawStartTime = timestamp;
-            fastestRayAngle = null;
-            hasStartedDrawing = true;
         }
+    }
+    if (!hasStartedDrawing) {
+        // reset ray drawing
+        drawStartTime = timestamp;
+        fastestRayAngle = null;
+        hasStartedDrawing = true;
     }
 
     // draw background
@@ -77,11 +78,18 @@ function animate(timestamp) {
     const b = { x: pointB.x, y: pointB.y, speed: speedB };
 
     if (fastestRayAngle == null) {
+        let anglesWhichReachedB = [];
+
         // draw all if no ray has reached point B yet
-        for (let i = -85; i <= 85; i += 5) {
+        for (let i = -85; i <= 85; i += (170 / numRays)) {
             if (drawRay(a, b, i, BOUNDS, timeElapsed)) {
-                fastestRayAngle = i;
+                anglesWhichReachedB.push(i);
             }
+        }
+
+        // take the middle ray which has reached point B
+        if (anglesWhichReachedB) {
+            fastestRayAngle = anglesWhichReachedB[Math.floor(anglesWhichReachedB.length / 2)];
         }
     } else {
         // if a ray has reached point B, only draw that ray
@@ -95,7 +103,7 @@ function animate(timestamp) {
     drawPoint(pointA);
     drawPoint(pointB);
 
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
 }
 
 requestAnimationFrame(animate);
@@ -114,6 +122,18 @@ canvas.addEventListener("mousedown", (e) => {
         objectBeingDragged = null;
     }
 })
+
+document.addEventListener("input", () => {
+    n_a = document.getElementById("n_1").value;
+    n_b = document.getElementById("n_2").value;
+    drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
+    numRays = document.getElementById("numRays").value;
+
+    speedA = drawingSpeedMultiplier / n_a;
+    speedB = drawingSpeedMultiplier / n_b;
+
+    hasStartedDrawing = false;
+});
 
 function mouseIsInsideCircle(center, radius) {
     if (Math.abs(center.x - mouse.x) <= radius &&
@@ -192,6 +212,8 @@ function drawRay(a, b, angle, bounds, time) {
 
         if (b.end.x >= b.x) {
             hasReachedPointB = true;
+            thetaAElement.textContent = angle.toFixed(3);
+            thetaBElement.textContent = (-b.angleRad * (180 / Math.PI)).toFixed(3);
         }
 
         if (b.end.x >= BOUNDS.right) {

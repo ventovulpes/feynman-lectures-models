@@ -1,6 +1,5 @@
 body {
     font-family: "Helvetica", sans-serif;
-    padding: 4px;
     padding-left: 10px;
     font-size: large;
     display: flex;
@@ -11,4 +10,16 @@ body {
 
 canvas {
     border: 2px solid black
+}
+
+.parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
 }
