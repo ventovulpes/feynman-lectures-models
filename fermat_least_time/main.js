@@ -124,8 +124,8 @@ canvas.addEventListener("mousedown", (e) => {
 })
 
 document.addEventListener("input", () => {
-    n_a = document.getElementById("n_1").value;
-    n_b = document.getElementById("n_2").value;
+    n_a = document.getElementById("n_a").value;
+    n_b = document.getElementById("n_b").value;
     drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
     numRays = document.getElementById("numRays").value;
 
