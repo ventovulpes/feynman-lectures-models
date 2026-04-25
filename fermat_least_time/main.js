@@ -16,6 +16,8 @@ let n_a = document.getElementById("n_a").value;
 let n_b = document.getElementById("n_b").value;
 let drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
 let numRays = document.getElementById("numRays").value;
+const RAY_ANGLE_SPAN = 180;
+const MAX_DRAWING_SPEED = 2;
 
 let speedA = drawingSpeedMultiplier / n_a;
 let speedB = drawingSpeedMultiplier / n_b;
@@ -33,13 +35,21 @@ let drawStartTime = null;
 let hasStartedDrawing = false;
 let fastestRayAngle = null;
 
-let animationReq = null;
+let rayData = [];
 
 function animate(timestamp) {
     if (!startTime) {
         startTime = timestamp
     }
 
+    drawRefraction(timestamp);
+
+    requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+
+function drawRefraction(timestamp) {
     if (objectBeingDragged == pointA) {
         if (pointA.x != mouse.x || pointA.y != mouse.y) {
             // if point A has been moved
@@ -60,6 +70,7 @@ function animate(timestamp) {
         drawStartTime = timestamp;
         fastestRayAngle = null;
         hasStartedDrawing = true;
+        rayData = [];
     }
 
     // draw background
@@ -81,9 +92,10 @@ function animate(timestamp) {
         let anglesWhichReachedB = [];
 
         // draw all if no ray has reached point B yet
-        for (let i = -85; i <= 85; i += (170 / numRays)) {
-            if (drawRay(a, b, i, BOUNDS, timeElapsed)) {
+        for (let i = -RAY_ANGLE_SPAN / 2; i <= RAY_ANGLE_SPAN / 2 + 1; i += (RAY_ANGLE_SPAN / numRays)) {
+            if (calculateRay(a, b, i, BOUNDS, timeElapsed)) {
                 anglesWhichReachedB.push(i);
+                rayData.push({ angle: i, time: timeElapsed * drawingSpeedMultiplier });
             }
         }
 
@@ -92,21 +104,28 @@ function animate(timestamp) {
             fastestRayAngle = anglesWhichReachedB[Math.floor(anglesWhichReachedB.length / 2)];
         }
     } else {
+        for (let i = -RAY_ANGLE_SPAN / 2; i <= RAY_ANGLE_SPAN / 2 + 1; i += (RAY_ANGLE_SPAN / numRays)) {
+            // calculate without drawing to get time for graph
+            if (calculateRay(a, b, i, BOUNDS, timeElapsed, drawRays=false)) {
+                if (!rayData.some(d => d.angle === i)) {
+                    rayData.push({ angle: i, time: timeElapsed * drawingSpeedMultiplier });
+                }
+            }
+        }
+
         // if a ray has reached point B, only draw that ray
-        drawRay(a, b, fastestRayAngle, BOUNDS, timeElapsed);
+        calculateRay(a, b, fastestRayAngle, BOUNDS, timeElapsed);
     }
 
     // draw line dividing surfaces
-    drawLine({x: BOUNDS.center, y: 0}, {x: BOUNDS.center, y: HEIGHT});
+    drawLine(ctx, {x: BOUNDS.center, y: 0}, {x: BOUNDS.center, y: HEIGHT});
 
     // draw start and end points
-    drawPoint(pointA);
-    drawPoint(pointB);
+    drawPoint(ctx, pointA);
+    drawPoint(ctx, pointB);
 
-    requestAnimationFrame(animate);
+    drawGraph(rayData);
 }
-
-requestAnimationFrame(animate);
 
 canvas.addEventListener("mousemove", (e) => {
     mouse.x = e.offsetX;
@@ -129,6 +148,11 @@ document.addEventListener("input", () => {
     drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
     numRays = document.getElementById("numRays").value;
 
+    if (drawingSpeedMultiplier > MAX_DRAWING_SPEED) {
+        document.getElementById("drawSpeed").value = MAX_DRAWING_SPEED;
+        drawingSpeedMultiplier = MAX_DRAWING_SPEED;
+    }
+
     speedA = drawingSpeedMultiplier / n_a;
     speedB = drawingSpeedMultiplier / n_b;
 
@@ -147,32 +171,17 @@ function clamp(value, a, b) {
     return Math.max(a, Math.min(value, b))
 }
 
-function drawPoint(position) {
-    ctx.beginPath();
-    ctx.arc(position.x, position.y, POINT_RADIUS, 0, 2 * Math.PI);
-    ctx.fillStyle = "black";
-    ctx.fill();
-}
-
-function drawLine(start, end, color = "black", width = 2) {
-    ctx.beginPath();
-    ctx.lineWidth = width;
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
-    ctx.strokeStyle = color
-    ctx.stroke();
-}
-
 /**
-* Draws two rays at a certain point in time, each passing through a specific point and having a certain speed
+* Calculates two rays at a certain point in time, each passing through a specific point and having a certain speed
 * @param {{x: number, y: number, speed: number}} a - The point on the left side
 * @param {{x: number, y: number, speed: number}} b - The point on the right side
 * @param {number} angle - The angle at which the ray passes through *a*
 * @param {{center: number, right: number}} center - The boundaries for the left and right sides
 * @param {number} time - Time elapsed for drawing
-* @returns {boolean} If the ray has reached the second point
+* @param {boolean} drawRays - If the two rays should be drawn
+* @returns {boolean} If the second ray has reached the second point
 */
-function drawRay(a, b, angle, bounds, time) {
+function calculateRay(a, b, angle, bounds, time, drawRays = true) {
     var hasReachedPointB = false;
 
     a.angleRad = -angle * (Math.PI / 180);
@@ -223,11 +232,15 @@ function drawRay(a, b, angle, bounds, time) {
             };
         }
 
-        // draw ray B
-        drawLine(b.start, b.end, "rgb(78, 197, 87", 3);
+        if (drawRays) {
+            // draw ray B
+            drawLine(ctx, b.start, b.end, GREEN, 3);
+        }
     }
-    // draw ray A
-    drawLine(a.start, a.end, "rgb(78, 197, 87", 3);
+    if (drawRays) {
+        // draw ray A
+        drawLine(ctx, a.start, a.end, GREEN, 3);
+    }
 
     return hasReachedPointB;
 }

@@ -1,6 +1,6 @@
 body {
     font-family: "Helvetica", sans-serif;
-    padding-left: 10px;
+    padding-left: 30px;
     font-size: large;
     display: flex;
     flex-direction: column;
@@ -8,7 +8,7 @@ body {
     overflow: scroll;
 }
 
-canvas {
+.canvas {
     border: 2px solid black
 }
 
