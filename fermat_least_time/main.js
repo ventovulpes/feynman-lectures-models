@@ -9,18 +9,18 @@ const BOUNDS = { left: 0, center: WIDTH / 2, right: WIDTH };
 const POINT_RADIUS = 6;
 const MARGIN_WIDTH = 20;
 
-const thetaAElement = document.getElementById("theta_a");
-const thetaBElement = document.getElementById("theta_b");
+const MODEL_TYPE_ELEMENT = document.getElementById("modelType");
+let curModelType = REFRACTION;
 
-let n_a = document.getElementById("n_a").value;
-let n_b = document.getElementById("n_b").value;
-let drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
-let numRays = document.getElementById("numRays").value;
+let drawingSpeedMultiplier, numRays;
+
+// parameters for refraction
+let thetaAElement, thetaBElement, n_a, n_b, speedA, speedB;
+// parameters for spherical mirror
+let mirrorRadius;
+
 const RAY_ANGLE_SPAN = 180;
 const MAX_DRAWING_SPEED = 2;
-
-let speedA = drawingSpeedMultiplier / n_a;
-let speedB = drawingSpeedMultiplier / n_b;
 
 const pointA = { x: WIDTH / 4, y: HEIGHT / 2 };
 const pointB = { x: WIDTH * 3 / 4, y: HEIGHT / 2 };
@@ -42,7 +42,14 @@ function animate(timestamp) {
         startTime = timestamp
     }
 
-    drawRefraction(timestamp);
+    switch (curModelType) {
+        case REFRACTION:
+            drawRefraction(timestamp);
+            break;
+        case SPHERICAL_MIRROR:
+            drawSphericalMirror(timestamp);
+            break;
+    }
 
     requestAnimationFrame(animate);
 }
@@ -74,9 +81,7 @@ function drawRefraction(timestamp) {
     }
 
     // draw background
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    drawBackground(ctx, WIDTH, HEIGHT);
 
     // draw refractive surface
     ctx.beginPath();
@@ -127,6 +132,15 @@ function drawRefraction(timestamp) {
     drawGraph(rayData);
 }
 
+function drawSphericalMirror(timestamp) {
+
+    drawBackground(ctx, WIDTH, HEIGHT);
+
+    // draw start and end points
+    drawPoint(ctx, pointA);
+    drawPoint(ctx, pointB);
+}
+
 canvas.addEventListener("mousemove", (e) => {
     mouse.x = e.offsetX;
     mouse.y = e.offsetY;
@@ -142,9 +156,17 @@ canvas.addEventListener("mousedown", (e) => {
     }
 })
 
+MODEL_TYPE_ELEMENT.addEventListener("input", () => {
+    curModelType = MODEL_TYPE_ELEMENT.value;
+    updateParameters();
+    clearGraph();
+})
+
 document.addEventListener("input", () => {
-    n_a = document.getElementById("n_a").value;
-    n_b = document.getElementById("n_b").value;
+    updateValuesFromInput();
+});
+
+function updateValuesFromInput() {
     drawingSpeedMultiplier = document.getElementById("drawSpeed").value;
     numRays = document.getElementById("numRays").value;
 
@@ -153,11 +175,18 @@ document.addEventListener("input", () => {
         drawingSpeedMultiplier = MAX_DRAWING_SPEED;
     }
 
-    speedA = drawingSpeedMultiplier / n_a;
-    speedB = drawingSpeedMultiplier / n_b;
+    if (curModelType === REFRACTION) {
+        n_a = document.getElementById("n_a").value;
+        n_b = document.getElementById("n_b").value;
+
+        speedA = drawingSpeedMultiplier / n_a;
+        speedB = drawingSpeedMultiplier / n_b;
+    } else if (curModelType === SPHERICAL_MIRROR) {
+        mirrorRadius = document.getElementById("mirrorRadius").value;
+    }
 
     hasStartedDrawing = false;
-});
+}
 
 function mouseIsInsideCircle(center, radius) {
     if (Math.abs(center.x - mouse.x) <= radius &&
