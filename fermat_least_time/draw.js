@@ -15,3 +15,9 @@ function drawLine(ctx, start, end, color = "black", width = 2) {
     ctx.strokeStyle = color
     ctx.stroke();
 }
+
+function drawBackground(ctx, width, height) {
+    ctx.beginPath();
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, width, height);
+}

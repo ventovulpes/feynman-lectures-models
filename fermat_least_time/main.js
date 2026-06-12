@@ -73,10 +73,7 @@ function drawRefraction(timestamp) {
         rayData = [];
     }
 
-    // draw background
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    drawBackground(ctx, WIDTH, HEIGHT)
 
     // draw refractive surface
     ctx.beginPath();
