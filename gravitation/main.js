@@ -109,7 +109,7 @@ canvas.addEventListener("pointerdown", (e) => {
     satellites.push(createSatellite(STARTING_POS, velocity));
 });
 
-canvas.addEventListener("input", () => {
+document.addEventListener("input", () => {
     velocityMultiplier = velocityMultiplierElement.value;
     planetMass = 10**mPlanetElement.value;
 })
