@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravitation</title>
+    <link href="./index.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Gravitation</h1>
+    <canvas class="canvas" id="canvas"></canvas>
+    <br>
+    <div class="parameters">
+        <div>
+            <label for="mass_planet">Mass of planet = 10^</label>
+            <input type="number" id="mass_planet" min="8" step="1" value="14" />
+        </div>
+        <div>
+            <label for="velocityMultiplier">Velocity multiplier:</label>
+            <input type="number" id="velocityMultiplier" min="0.1" step="0.1" value="0.6">
+        </div>
+        <button onclick="clearSatellites()">Clear satellites</button>
+    </div>
+    <p>Click to launch a satellite.</p>
+    <script src="./draw.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>
