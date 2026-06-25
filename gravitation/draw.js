@@ -43,3 +43,15 @@ function drawTriangle(ctx, point, angleRad, size = {width: 5, length: 20}, color
     ctx.lineTo(b.x, b.y);
     ctx.fill();
 }
+
+function drawPath(ctx, path, lineWidth = 1, color = "white") {
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
+    const {x, y} = path.at(0);
+    ctx.moveTo(x, y);
+    path.forEach(({x, y}) => {
+        ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+}

@@ -5,6 +5,8 @@ const ctx = canvas.getContext("2d");
 
 const mPlanetElement = document.getElementById("mass_planet");
 const velocityMultiplierElement = document.getElementById("velocityMultiplier");
+const drawPathsElement = document.getElementById("drawPaths");
+const drawLastPathElement = document.getElementById("drawLastPath");
 
 const WIDTH = 800;
 const HEIGHT = 800;
@@ -21,6 +23,9 @@ const SATELLITE_SIZE = {
 }
 const STARTING_POS = {x: PLANET_POSITION.x, y: PLANET_POSITION.y - PLANET_RADIUS};
 const DESTRUCTION_OFFSET = 0.1;
+const MIN_DISTANCE_TO_SAVE_TO_PATH = 5;
+let doDrawPaths = true;
+let doDrawLastPath = true;
 
 canvas.width = WIDTH * DPR;
 canvas.height = HEIGHT * DPR;
@@ -33,7 +38,8 @@ const satellites = [];
 function createSatellite(position, velocity) {
     return {
         position: {...position},
-        velocity: {...velocity}
+        velocity: {...velocity},
+        path: [STARTING_POS]
     }
 }
 
@@ -53,6 +59,13 @@ function updateSatellitePosition(satellite, timeElapsed) {
 
     satellite.position.x += secsElapsed * satellite.velocity.x;
     satellite.position.y += secsElapsed * satellite.velocity.y;
+
+    savePositionToPath(satellite);
+}
+
+function savePositionToPath(satellite) {
+    if (distance(satellite.position, satellite.path.at(-1)) < MIN_DISTANCE_TO_SAVE_TO_PATH) return;
+    satellite.path.push({x: satellite.position.x, y: satellite.position.y});
 }
 
 function clearSatellites() {
@@ -71,10 +84,10 @@ function frame(time) {
     
     const toDestroy = []
 
-    satellites.forEach((satellite, index) => {
-        updateSatellitePosition(satellite, timeElapsed);
-        const position = satellite.position;
-        const angle = Math.atan2(satellite.velocity.y, satellite.velocity.x);
+    satellites.forEach(({position, velocity, path}, index) => {
+        updateSatellitePosition(satellites[index], timeElapsed);
+        const angle = Math.atan2(velocity.y, velocity.x);
+        const isLast = index == satellites.length - 1;
 
         if (position.x < -SATELLITE_SIZE.length || position.x > WIDTH + SATELLITE_SIZE.length ||
             position.y < -SATELLITE_SIZE.length || position.y > HEIGHT + SATELLITE_SIZE.length) {
@@ -83,7 +96,14 @@ function frame(time) {
             toDestroy.push(index);
         }
 
-        drawTriangle(ctx, position, angle, SATELLITE_SIZE);
+        let color = "white";
+        if (isLast) {
+            color = "cyan";
+        }
+        if (doDrawPaths || (doDrawLastPath && isLast)) {
+            drawPath(ctx, path, 1, color);
+        }
+        drawTriangle(ctx, position, angle, SATELLITE_SIZE, color);
     });
     toDestroy.forEach((i) => {
         satellites.splice(i, 1);
@@ -112,4 +132,12 @@ canvas.addEventListener("pointerdown", (e) => {
 document.addEventListener("input", () => {
     velocityMultiplier = velocityMultiplierElement.value;
     planetMass = 10**mPlanetElement.value;
+    doDrawPaths = drawPathsElement.checked;
+    if (doDrawPaths) {
+        drawLastPathElement.disabled = true;
+        drawLastPathElement.checked = true;
+    } else {
+        drawLastPathElement.disabled = false;
+    }
+    doDrawLastPath = drawLastPathElement.checked;
 })

@@ -26,9 +26,3 @@ button:active {
     flex-direction: column;
     gap: 10px;
 }
-
-.row {
-    display: flex;
-    flex-direction: row;
-    column-gap: 20px;
-}
