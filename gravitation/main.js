@@ -78,9 +78,9 @@ function frame(time) {
     const timeElapsed = time - lastTime;
     lastTime = time;
 
-    drawBackground(ctx, WIDTH, HEIGHT);
-    drawCircle(ctx, WIDTH / 2, HEIGHT / 2, PLANET_RADIUS, "white");
-    drawArrow(ctx, STARTING_POS, pointer);
+    Draw.background(ctx, WIDTH, HEIGHT);
+    Draw.circle(ctx, WIDTH / 2, HEIGHT / 2, PLANET_RADIUS, "white");
+    Draw.arrow(ctx, STARTING_POS, pointer);
     
     const toDestroy = []
 
@@ -101,9 +101,9 @@ function frame(time) {
             color = "cyan";
         }
         if (doDrawPaths || (doDrawLastPath && isLast)) {
-            drawPath(ctx, path, 1, color);
+            Draw.path(ctx, path, 1, color);
         }
-        drawTriangle(ctx, position, angle, SATELLITE_SIZE, color);
+        Draw.triangle(ctx, position, angle, SATELLITE_SIZE, color);
     });
     toDestroy.forEach((i) => {
         satellites.splice(i, 1);

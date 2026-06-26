@@ -8,6 +8,7 @@ const HEIGHT = 600;
 const BOUNDS = { left: 0, center: WIDTH / 2, right: WIDTH };
 const POINT_RADIUS = 6;
 const MARGIN_WIDTH = 20;
+const GREEN = "rgb(78, 197, 87)";
 
 const thetaAElement = document.getElementById("theta_a");
 const thetaBElement = document.getElementById("theta_b");
@@ -73,7 +74,7 @@ function drawRefraction(timestamp) {
         rayData = [];
     }
 
-    drawBackground(ctx, WIDTH, HEIGHT)
+    Draw.background(ctx, WIDTH, HEIGHT);
 
     // draw refractive surface
     ctx.beginPath();
@@ -115,11 +116,11 @@ function drawRefraction(timestamp) {
     }
 
     // draw line dividing surfaces
-    drawLine(ctx, {x: BOUNDS.center, y: 0}, {x: BOUNDS.center, y: HEIGHT});
+    Draw.line(ctx, {x: BOUNDS.center, y: 0}, {x: BOUNDS.center, y: HEIGHT});
 
     // draw start and end points
-    drawPoint(ctx, pointA);
-    drawPoint(ctx, pointB);
+    Draw.point(ctx, pointA);
+    Draw.point(ctx, pointB);
 
     drawGraph(rayData);
 }
@@ -231,12 +232,12 @@ function calculateRay(a, b, angle, bounds, time, drawRays = true) {
 
         if (drawRays) {
             // draw ray B
-            drawLine(ctx, b.start, b.end, GREEN, 3);
+            Draw.line(ctx, b.start, b.end, 3, GREEN);
         }
     }
     if (drawRays) {
         // draw ray A
-        drawLine(ctx, a.start, a.end, GREEN, 3);
+        Draw.line(ctx, a.start, a.end, 3, GREEN);
     }
 
     return hasReachedPointB;

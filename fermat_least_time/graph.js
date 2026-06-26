@@ -28,16 +28,18 @@ function drawGraph(data) {
     data.forEach(d => {
         const x = (d.angle + (RAY_ANGLE_SPAN / 2)) * ((GRAPH_WIDTH - 2*GRAPH_MARGIN) / RAY_ANGLE_SPAN) + GRAPH_MARGIN;
         const y = GRAPH_HEIGHT - ((d.time - minTime) * ((GRAPH_HEIGHT - 2*GRAPH_MARGIN) / (maxTime - minTime)) + GRAPH_MARGIN + GRAPH_MIN_TIME_MARGIN);
-        drawPoint(graphCtx, {x: x, y: y}, GREEN, GRAPH_POINT_RADIUS);
+        Draw.point(graphCtx, {x: x, y: y}, GRAPH_POINT_RADIUS, GREEN);
     });
 
     // draw axes
-    drawLine(graphCtx, { x: GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN }, { x: GRAPH_WIDTH - GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN }, width=4);
-    drawLine(graphCtx, { x: GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN }, { x: GRAPH_MARGIN, y: 0 }, width=4);
+    Draw.line(graphCtx, { x: GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN }, { x: GRAPH_WIDTH - GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN });
+    Draw.line(graphCtx, { x: GRAPH_MARGIN, y: GRAPH_HEIGHT - GRAPH_MARGIN }, { x: GRAPH_MARGIN, y: 0 });
 
     // draw labels
     graphCtx.font = "16px Helvetica";
     graphCtx.fillStyle = "black";
+
+
     graphCtx.textAlign = "center";
     graphCtx.fillText("Angle (°)", GRAPH_WIDTH / 2, GRAPH_HEIGHT - (GRAPH_MARGIN / 2));
 
@@ -54,5 +56,5 @@ function drawGraph(data) {
 }
 
 function clearGraph() {
-    drawBackground(graphCtx, GRAPH_WIDTH, GRAPH_HEIGHT);
+    Draw.background(graphCtx, GRAPH_WIDTH, GRAPH_HEIGHT);
 }
