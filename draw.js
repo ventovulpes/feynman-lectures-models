@@ -32,8 +32,8 @@ const Draw = {
         ctx.width = lineWidth;
         const angleRad = Math.atan2(end.y - start.y, end.x - start.x);
 
-        this.line(ctx, start.x, start.y, end.x - Math.cos(angleRad) * arrowHead.length, end.y - Math.sin(angleRad) * arrowHead.length);
-        drawTriangle(ctx, end, angleRad, arrowHead, color);
+        this.line(ctx, {x: start.x, y: start.y}, {x: end.x - Math.cos(angleRad) * arrowHead.length, y: end.y - Math.sin(angleRad) * arrowHead.length}, lineWidth, color);
+        this.triangle(ctx, end, angleRad, arrowHead, color);
     },
 
     triangle(ctx, point, angleRad, size = {width: 5, length: 20}, color = "white") {

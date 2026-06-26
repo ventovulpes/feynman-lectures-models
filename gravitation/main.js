@@ -78,7 +78,7 @@ function frame(time) {
     const timeElapsed = time - lastTime;
     lastTime = time;
 
-    Draw.background(ctx, WIDTH, HEIGHT);
+    Draw.background(ctx, WIDTH, HEIGHT, "black");
     Draw.circle(ctx, WIDTH / 2, HEIGHT / 2, PLANET_RADIUS, "white");
     Draw.arrow(ctx, STARTING_POS, pointer);
     
