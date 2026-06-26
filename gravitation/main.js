@@ -51,7 +51,7 @@ function updateSatellitePosition(satellite, timeElapsed) {
     const secsElapsed = timeElapsed / 1000;
 
     const G = 6.67 * 10**-11;
-    const gravitationForce = G * ((satelliteMass * planetMass) / distance(satellite.position, PLANET_POSITION));
+    const gravitationForce = G * ((satelliteMass * planetMass) / distance(satellite.position, PLANET_POSITION)**2);
     const forceAngle = Math.atan2(PLANET_POSITION.y - satellite.position.y, PLANET_POSITION.x - satellite.position.x);
 
     satellite.velocity.x += secsElapsed * gravitationForce * Math.cos(forceAngle);
