@@ -1,0 +1,9 @@
+body {
+    font-family: "Helvetica", sans-serif;
+    padding-left: 30px;
+    font-size: large;
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+    overflow: scroll;
+}
