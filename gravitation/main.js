@@ -51,7 +51,7 @@ function updateSatellitePosition(satellite, timeElapsed) {
     const secsElapsed = timeElapsed / 1000;
 
     const G = 6.67 * 10**-11;
-    const gravitationAcceleration = G * ((satelliteMass) / distance(satellite.position, PLANET_POSITION)**2);
+    const gravitationAcceleration = G * ((planetMass) / distance(satellite.position, PLANET_POSITION)**2);
     const forceAngle = Math.atan2(PLANET_POSITION.y - satellite.position.y, PLANET_POSITION.x - satellite.position.x);
 
     satellite.velocity.x += secsElapsed * gravitationAcceleration * Math.cos(forceAngle);
@@ -129,7 +129,7 @@ canvas.addEventListener("pointerdown", (e) => {
     satellites.push(createSatellite(STARTING_POS, velocity));
 });
 
-document.addEventListener("input", () => {
+document.addEventListener("input", (event) => {
     velocityMultiplier = velocityMultiplierElement.value;
     planetMass = 10**mPlanetElement.value;
     doDrawPaths = drawPathsElement.checked;
@@ -140,4 +140,8 @@ document.addEventListener("input", () => {
         drawLastPathElement.disabled = false;
     }
     doDrawLastPath = drawLastPathElement.checked;
+
+    if (event.target.type === "number") {
+        clearSatellites();
+    }
 })
