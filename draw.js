@@ -15,9 +15,9 @@ const Draw = {
         ctx.stroke();
     },
 
-    background(ctx, width, height, color = "white") {
+    background(ctx, width, height, color = "white", start = {x: 0, y: 0}) {
         ctx.fillStyle = color;
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(start.x, start.y, width, height);
     },
 
     circle(ctx, x, y, radius, color = "white") {
@@ -25,6 +25,16 @@ const Draw = {
         ctx.arc(x, y, radius, 0, 2 * Math.PI);
         ctx.fillStyle = color;
         ctx.fill();
+    },
+
+    outlineCircle(ctx, x, y, radius, outlineWidth = 1, color = "white", outlineColor = "cyan") {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.strokeStyle = outlineColor;
+        ctx.lineWidth = outlineWidth;
+        ctx.fill();
+        ctx.stroke();
     },
 
     arrow(ctx, start, end, lineWidth = 2, arrowHead = {width: 5, length: 10}, color = "white") {
@@ -65,5 +75,12 @@ const Draw = {
             ctx.lineTo(x, y);
         });
         ctx.stroke();
+    },
+
+    text(ctx, text, position, px, font = "serif", color = "white", align = "center") {
+        ctx.font = `${px}px ${font}`;
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        ctx.fillText(text, position.x, position.y);
     }
 }
