@@ -14,12 +14,18 @@ let cameraX = 0;
 let cameraY = 0;
 ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-const STARTING_MASS = 10**6;
+const spawnMassElement = document.getElementById("spawnMass");
+const velocityMultiplerElement = document.getElementById("velocityMultiplier");
+const cameraSmoothingElement = document.getElementById("cameraSmoothing");
+
+let spawnMass = 10**spawnMassElement.value;
+let velocityMultiplier = velocityMultiplerElement.value;
+let cameraSmoothing = 2;
+let cameraSmoothFactor = 10**-(cameraSmoothing + 1);
+
 const G = 1;
 const MERGE_DISTANCE = 0;
 const MASS_MULT_FOR_RADIUS = 0.0001;
-const VELOCITY_MULT = 0.2;
-const CAMERA_SMOOTH_FACTOR = 10**-3;
 const CAMERA_ARROW_MULT = 1;
 
 const GRID_INTERVAL = 100;
@@ -38,6 +44,10 @@ function distance(a, b) {
 
 function getMagnitude(vector) {
     return Math.sqrt(vector.x**2 + vector.y**2);
+}
+
+function clamp(value, lower, higher) {
+    return Math.min(higher, Math.max(lower, value));
 }
 
 function getRadius(mass) {
@@ -187,10 +197,10 @@ function spawnBody(position, velocityHead) {
     bodies.push({
         position: position,
         velocity: {
-            x: (velocityHead.x - position.x) * VELOCITY_MULT,
-            y: (velocityHead.y - position.y) * VELOCITY_MULT
+            x: (velocityHead.x - position.x) * velocityMultiplier,
+            y: (velocityHead.y - position.y) * velocityMultiplier
         },
-        mass: STARTING_MASS
+        mass: spawnMass
     });
 
     toSpawnPosition = null;
@@ -222,8 +232,8 @@ function moveCamera(timeElapsed, targetPosition) {
         y: targetPosition.y - cameraY
     }
 
-    cameraX += deltaCameraPosition.x * CAMERA_SMOOTH_FACTOR * timeElapsed;
-    cameraY += deltaCameraPosition.y * CAMERA_SMOOTH_FACTOR * timeElapsed;
+    cameraX += deltaCameraPosition.x * cameraSmoothFactor * timeElapsed;
+    cameraY += deltaCameraPosition.y * cameraSmoothFactor * timeElapsed;
     
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.translate(WIDTH / 2 - cameraX, HEIGHT / 2 - cameraY);
@@ -260,6 +270,20 @@ function drawGrid() {
         const end = {x: bottomRight.x, y: startingPosition.y + i * GRID_INTERVAL};
         Draw.line(ctx, start, end, 1, `rgba(255, 255, 255, ${GRID_OPACITY})`);
     }
+}
+
+function incrementCameraSmoothing() {
+    cameraSmoothing = clamp(cameraSmoothing + 1, 1, 3);
+    cameraSmoothingElement.innerText = cameraSmoothing;
+
+    cameraSmoothFactor = 10**-(cameraSmoothing + 1);
+}
+
+function decrementCameraSmoothing() {
+    cameraSmoothing = clamp(cameraSmoothing - 1, 1, 3);
+    cameraSmoothingElement.innerText = cameraSmoothing;
+
+    cameraSmoothFactor = 10**-(cameraSmoothing + 1);
 }
 
 let lastTime = 0;
@@ -319,6 +343,8 @@ window.addEventListener("keydown", (event) => {
         selectionIndex++;
     } else if (event.code === "Backspace") {
         deleteSelectedBody();
+    } else if (event.code === "KeyC") {
+        toSpawnPosition = null;
     }
 
     if (selectionIndex >= bodies.length) {
@@ -326,4 +352,12 @@ window.addEventListener("keydown", (event) => {
     } else if (selectionIndex < CENTER_OF_MASS) {
         selectionIndex = bodies.length - 1;
     }
+});
+
+window.addEventListener("input", () => {
+    spawnMassElement.value = clamp(spawnMassElement.value, 5, 8);
+    velocityMultiplerElement.value = clamp(velocityMultiplerElement.value, 0.01, 2);
+
+    spawnMass = 10**spawnMassElement.value;
+    velocityMultiplier = velocityMultiplerElement.value;
 });

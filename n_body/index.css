@@ -7,3 +7,20 @@ body {
     width: 800px;
     overflow: scroll;
 }
+
+h2 {
+    all: unset;
+    font-weight: bold;
+}
+
+.parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+}
